@@ -1,0 +1,118 @@
+.mgr-container {
+  padding: 30px;
+  background: #f3f4f6;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+/* Header */
+.mgr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logout-btn {
+  background: #dc2626;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.logout-btn:hover {
+  background: #b91c1c;
+}
+
+/* Layout */
+.mgr-layout {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+  margin-top: 25px;
+}
+
+/* TABLE SECTION */
+.mgr-table-section {
+  flex: 1;
+  min-width: 350px;
+}
+
+.table-wrapper {
+  background: white;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.mgr-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.mgr-table th {
+  background: #e5e7eb;
+  padding: 12px;
+  font-weight: bold;
+  text-align: left;
+}
+
+.mgr-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Status Colors */
+.status.pending { color: #f59e0b; font-weight: bold; }
+.status.approved { color: #10b981; font-weight: bold; }
+.status.rejected { color: #ef4444; font-weight: bold; }
+
+/* Buttons */
+.approve-btn, .reject-btn {
+  padding: 6px 10px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  color: white;
+}
+
+.approve-btn {
+  background: #16a34a; /* Green */
+  margin-right: 5px;
+}
+.approve-btn:hover {
+  background: #15803d;
+}
+
+.reject-btn {
+  background: #dc2626; /* Red */
+}
+.reject-btn:hover {
+  background: #b91c1c;
+}
+
+/* CALENDAR SECTION */
+.mgr-calendar-section {
+  min-width: 300px;
+}
+
+.calendar-box {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.calendar-note {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 8px;
+}
+
+/* OFF DAY on Calendar */
+.calendar-off {
+  color: red;
+  font-size: 10px;
+  font-weight: bold;
+}
