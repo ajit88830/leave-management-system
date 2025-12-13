@@ -14,11 +14,30 @@ const formatDate = (dateString) => {
     });
 };
 
+// --- NEW HELPER FUNCTION: Calculate days between two dates ---
+const getDaysDiff = (startDate, endDate) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    // Add 1 day to include both the start and end date
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    return diffDays;
+};
+
+
 const EmployeeDashboard = () => {
     const { user, logout } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const [leaves, setLeaves] = useState([]);
+    // 1. STATE CHANGE: Use state for dynamic balances
+    const [leaveBalances, setLeaveBalances] = useState({
+        casual: 12, // Initial total allowance
+        sick: 7,    // Initial total allowance
+        earned: 15  // Initial total allowance
+    });
+    
     const [formData, setFormData] = useState({
         startDate: '',
         endDate: '',
@@ -26,23 +45,42 @@ const EmployeeDashboard = () => {
         reason: ''
     });
 
-    // Dummy leave balances (Use actual data fetched from API if available)
-    const leaveBalances = {
-        casual: 12,
-        sick: 7,
-        earned: 15
-    };
+    // --- NEW FUNCTION: Calculate Balances based on fetched leaves ---
+    const calculateBalances = useCallback((fetchedLeaves) => {
+        // Start with the full initial allowance (Simulating backend allowance)
+        let newBalances = { casual: 12, sick: 7, earned: 15 };
+
+        fetchedLeaves.forEach(leave => {
+            // Only count APPROVED leaves against the balance
+            if (leave.status === 'Approved') {
+                const days = getDaysDiff(leave.startDate, leave.endDate);
+                const type = leave.leaveType.toLowerCase();
+
+                // Subtract approved days from the corresponding balance
+                if (newBalances[type] !== undefined) {
+                    newBalances[type] = Math.max(0, newBalances[type] - days); // Ensure balance doesn't go below 0
+                }
+            }
+        });
+
+        setLeaveBalances(newBalances);
+    }, []);
+    // --- END NEW FUNCTION ---
 
     const fetchLeaves = useCallback(async () => {
-        if (!user || !user.id) return; // Check if user and user.id exist
+        if (!user || !user.id) return;
         try {
             const res = await axios.get(`http://localhost:5000/api/leaves/my-leaves/${user.id}`);
-            setLeaves(res.data);
+            const fetchedLeaves = res.data;
+            setLeaves(fetchedLeaves);
+            
+            // 2. SYNCHRONIZE: Update balances immediately after fetching history
+            calculateBalances(fetchedLeaves); 
+
         } catch (err) {
             console.error("Error fetching leaves:", err);
-            // Optionally set an error state here
         }
-    }, [user]);
+    }, [user, calculateBalances]);
 
     useEffect(() => {
         fetchLeaves();
@@ -51,7 +89,7 @@ const EmployeeDashboard = () => {
     const handleApply = async (e) => {
         e.preventDefault();
         
-        // Basic Input Validation
+        // ... (Input Validation remains the same) ...
         if (!formData.startDate || !formData.endDate || !formData.reason) {
             alert('Please fill in all required fields.');
             return;
@@ -68,9 +106,10 @@ const EmployeeDashboard = () => {
             });
 
             alert('Leave Applied Successfully! Awaiting Manager Approval.');
-            // Reset form fields
             setFormData({ startDate: '', endDate: '', leaveType: 'Casual', reason: '' }); 
-            fetchLeaves(); // Re-fetch list
+            
+            // 3. SYNCHRONIZE: Re-fetch list to see the "Pending" status
+            fetchLeaves(); 
             
         } catch (err) {
             console.error("Application error:", err);
@@ -84,7 +123,10 @@ const EmployeeDashboard = () => {
         try {
             await axios.delete(`http://localhost:5000/api/leaves/${id}`);
             alert('Leave Cancelled');
-            fetchLeaves();
+            
+            // 4. SYNCHRONIZE: Re-fetch list, which automatically updates the balances
+            fetchLeaves(); 
+            
         } catch (err) {
             console.error("Cancellation error:", err);
             alert(err.response?.data?.msg || 'Error cancelling leave. Only pending leaves can be cancelled.');
@@ -102,20 +144,23 @@ const EmployeeDashboard = () => {
                 </button>
             </header>
 
-            {/* 2. Leave Summary Cards */}
+            {/* 2. Leave Summary Cards (Now uses dynamic state) */}
             <div className="leave-cards">
                 <div className="leave-card border-casual">
                     <h4>Casual Leave Remaining</h4>
-                    <p className="leave-count">{leaveBalances.casual}</p>
+                    {/* Access state data */}
+                    <p className="leave-count">{leaveBalances.casual}</p> 
                 </div>
 
                 <div className="leave-card border-sick">
                     <h4>Sick Leave Remaining</h4>
-                    <p className="leave-count">{leaveBalances.sick}</p>
+                    {/* Access state data */}
+                    <p className="leave-count">{leaveBalances.sick}</p> 
                 </div>
 
                 <div className="leave-card border-earned">
                     <h4>Earned Leave Remaining</h4>
+                    {/* Access state data */}
                     <p className="leave-count">{leaveBalances.earned}</p>
                 </div>
             </div>
@@ -123,7 +168,7 @@ const EmployeeDashboard = () => {
             {/* 3. Main Content Grid: Form (Left) and History (Right) */}
             <div className="dashboard-content-grid">
                 
-                {/* A. Apply Leave Form Card */}
+                {/* A. Apply Leave Form Card (JSX is unchanged) */}
                 <div className="leave-form-card">
                     <div className="section-title">Apply for Leave</div>
 
@@ -167,7 +212,7 @@ const EmployeeDashboard = () => {
                     </form>
                 </div>
 
-                {/* B. Leave History Table Card */}
+                {/* B. Leave History Table Card (JSX is unchanged) */}
                 <div className="table-card">
                     <div className="section-title">My Leave History</div>
                     
