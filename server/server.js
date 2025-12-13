@@ -17,14 +17,16 @@ if (!process.env.MONGO_URI) {
 
 // --- PRODUCTION CORS CONFIGURATION ---
 // IMPORTANT: Update this URL to your deployed React frontend URL.
-// If you are using Render for the frontend too, it will be similar to your backend URL.
+// FIX APPLIED HERE: Replaced placeholder with the Vercel URL
+const VERCEL_FRONTEND_URL = 'https://leave-management-system-frontend.vercel.app'; // <--- **REPLACE THIS WITH YOUR ACTUAL VERCEL DOMAIN**
+
 const ALLOWED_ORIGIN = process.env.NODE_ENV === 'production' 
-    ? 'YOUR_FRONTEND_URL_HERE' // <-- REPLACE THIS WITH YOUR DEPLOYED FRONTEND URL
+    ? VERCEL_FRONTEND_URL 
     : 'http://localhost:3000'; // Development
 
 // Middleware
 app.use(cors({
-    origin: ALLOWED_ORIGIN,
+    origin: ALLOWED_ORIGIN, // <--- This now uses your Vercel URL
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
 }));
