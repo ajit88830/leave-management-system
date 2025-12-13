@@ -72,10 +72,6 @@
   margin-top: 25px;
 }
 
-/* --- TABLE SECTION --- */
-.mgr-table-section {
-  /* No min-width needed due to grid layout */
-}
 
 .mgr-table-section h3 {
     font-size: 1.5rem; 
