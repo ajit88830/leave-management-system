@@ -9,20 +9,38 @@ dotenv.config();
 const app = express();
 
 // --- ⚠️ CRITICAL: CONFIGURE CORS ORIGIN ⚠️ ---
-// FIX APPLIED: Using the LATEST correct Vercel Origin URL from the error message.
-const VERCEL_FRONTEND_URL = 'https://leave-management-system-q3j4ox1mo-ajit-singhs-projects-af6c039f.vercel.app'; 
+// FIX APPLIED: Allowing the specific, current Vercel URL AND localhost.
+// If your Vercel URL changes again, you MUST update this list.
+const ALLOWED_ORIGINS = [
+    // Current Vercel URL from your last error log
+    'https://leave-management-system-q3j4ox1mo-ajit-singhs-projects-af6c039f.vercel.app', 
+    // Previous Vercel URL that might still be active
+    'https://leave-management-system-tau-three.vercel.app',
+    // The previous dynamic Vercel URL
+    'https://leave-management-system-6nfzgz9vl-ajit-singhs-projects-af6c039f.vercel.app',
+    // Localhost for development
+    'http://localhost:3000', 
+];
 
-// Determine the allowed origin based on the environment
-const ALLOWED_ORIGIN = process.env.NODE_ENV === 'production' 
-    ? VERCEL_FRONTEND_URL 
-    : 'http://localhost:3000'; // Development
+// Determine the final allowed origin setup
+const corsOptions = {
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps, curl requests)
+        // or requests from the allowed list
+        if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    // Even though you use localStorage, keeping credentials: true is best practice 
+    // as it allows cookies to be sent if you ever switch methods.
+    credentials: true, 
+};
 
 // Middleware
-app.use(cors({
-    origin: ALLOWED_ORIGIN, // <--- This now matches your new Vercel domain
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true, // Important for cookies/auth tokens used in login
-}));
+app.use(cors(corsOptions));
 
 app.use(express.json());
 
@@ -53,7 +71,6 @@ mongoose.connect(process.env.MONGO_URI)
     });
 
 // Routes 
-// WARNING: Ensure your authRoutes.js does NOT apply authMiddleware to the /login route
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/leaves', require('./routes/leaveRoutes')); 
 
