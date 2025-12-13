@@ -6,6 +6,9 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import './ManagerDashboard.css'; 
 
+// 🚀 FIX: Define the base URL dynamically
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
 // Helper function for consistent date display
 const formatDate = (dateString) => {
     if (!dateString) return '-';
@@ -16,7 +19,6 @@ const formatDate = (dateString) => {
 };
 
 // Helper function to safely get the employee name
-// This prevents crashes if employeeId is just an ID string or null
 const getEmployeeName = (employeeId) => {
     // Check if employeeId is an object and has a name property
     if (employeeId && typeof employeeId === 'object' && employeeId.name) {
@@ -42,10 +44,8 @@ const ManagerDashboard = () => {
 
     const fetchAllLeaves = async () => {
         try {
-            // Ensure this endpoint either fetches only leaves relevant to this manager's team, 
-            // OR the backend is configured to send back the populated 'employeeId' field 
-            // (i.e., the full employee object, not just the ID string).
-            const res = await axios.get('http://localhost:5000/api/leaves/all');
+            // 🎯 FIXED URL
+            const res = await axios.get(`${API_BASE_URL}/api/leaves/all`);
             setLeaves(res.data);
         } catch (err) {
             console.error("Error fetching leaves:", err);
@@ -55,7 +55,8 @@ const ManagerDashboard = () => {
     const handleAction = async (id, status) => {
         const comment = prompt(`Enter comment for ${status} (Optional, press OK to submit):`);
         try {
-            await axios.put(`http://localhost:5000/api/leaves/${id}`, {
+            // 🎯 FIXED URL
+            await axios.put(`${API_BASE_URL}/api/leaves/${id}`, {
                 status,
                 managerComment: comment
             });

@@ -4,6 +4,9 @@ import AuthContext from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import './EmployeeDashboard.css';
 
+// 🚀 FIX: Define the base URL dynamically
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
 // Helper function for consistent date display
 const formatDate = (dateString) => {
     if (!dateString) return '-';
@@ -14,7 +17,7 @@ const formatDate = (dateString) => {
     });
 };
 
-// --- NEW HELPER FUNCTION: Calculate days between two dates ---
+// Helper function: Calculate days between two dates
 const getDaysDiff = (startDate, endDate) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -31,11 +34,10 @@ const EmployeeDashboard = () => {
     const navigate = useNavigate();
 
     const [leaves, setLeaves] = useState([]);
-    // 1. STATE CHANGE: Use state for dynamic balances
     const [leaveBalances, setLeaveBalances] = useState({
         casual: 12, // Initial total allowance
-        sick: 7,    // Initial total allowance
-        earned: 15  // Initial total allowance
+        sick: 7,    // Initial total allowance
+        earned: 15  // Initial total allowance
     });
     
     const [formData, setFormData] = useState({
@@ -70,7 +72,8 @@ const EmployeeDashboard = () => {
     const fetchLeaves = useCallback(async () => {
         if (!user || !user.id) return;
         try {
-            const res = await axios.get(`http://localhost:5000/api/leaves/my-leaves/${user.id}`);
+            // 🎯 FIXED URL
+            const res = await axios.get(`${API_BASE_URL}/api/leaves/my-leaves/${user.id}`);
             const fetchedLeaves = res.data;
             setLeaves(fetchedLeaves);
             
@@ -100,7 +103,8 @@ const EmployeeDashboard = () => {
         }
 
         try {
-            await axios.post('http://localhost:5000/api/leaves/apply', {
+            // 🎯 FIXED URL
+            await axios.post(`${API_BASE_URL}/api/leaves/apply`, {
                 employeeId: user.id,
                 ...formData
             });
@@ -121,7 +125,8 @@ const EmployeeDashboard = () => {
         if (!window.confirm("Are you sure you want to cancel this pending request?")) return;
 
         try {
-            await axios.delete(`http://localhost:5000/api/leaves/${id}`);
+            // 🎯 FIXED URL
+            await axios.delete(`${API_BASE_URL}/api/leaves/${id}`);
             alert('Leave Cancelled');
             
             // 4. SYNCHRONIZE: Re-fetch list, which automatically updates the balances
