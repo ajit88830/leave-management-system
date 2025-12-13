@@ -9,9 +9,9 @@ dotenv.config();
 const app = express();
 
 // --- ⚠️ CRITICAL: CONFIGURE CORS ORIGIN ⚠️ ---
-// You must replace this placeholder with the exact, full HTTPS URL of your Vercel frontend.
-// E.g., 'https://leave-management-system-tau-three.vercel.app'
-const VERCEL_FRONTEND_URL = 'YOUR_VERCEL_FRONTEND_URL_HERE'; 
+// FIX APPLIED: Using the specific Vercel URL pattern provided in your last message.
+// This is the domain the browser will report as the 'Origin'.
+const VERCEL_FRONTEND_URL = 'https://leave-management-system-6nfzgz9vl-ajit-singhs-projects-af6c039f.vercel.app'; 
 
 // Determine the allowed origin based on the environment
 const ALLOWED_ORIGIN = process.env.NODE_ENV === 'production' 
@@ -20,9 +20,9 @@ const ALLOWED_ORIGIN = process.env.NODE_ENV === 'production'
 
 // Middleware
 app.use(cors({
-    origin: ALLOWED_ORIGIN, // <--- This sets the Access-Control-Allow-Origin header
+    origin: ALLOWED_ORIGIN, // <--- This is the core fix for the "Network Failed" error
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true, // Important for sending/receiving cookies/auth tokens
+    credentials: true, // Important for cookies/auth tokens used in login
 }));
 
 app.use(express.json());
@@ -41,7 +41,6 @@ app.get('/', (req, res) => {
         environment: process.env.NODE_ENV || 'development'
     });
 });
-
 // Health check (Render / load balancer friendly)
 app.get('/health', (req, res) => res.status(200).json({ status: 'ok' }));
 
@@ -54,8 +53,7 @@ mongoose.connect(process.env.MONGO_URI)
         process.exit(1);
     });
 
-// Routes (require existing route files)
-// Ensure these files exist in your routes directory
+// Routes 
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/leaves', require('./routes/leaveRoutes'));
 
