@@ -9,9 +9,8 @@ dotenv.config();
 const app = express();
 
 // --- ⚠️ CRITICAL: CONFIGURE CORS ORIGIN ⚠️ ---
-// FIX APPLIED: Using the specific Vercel URL pattern provided in your last message.
-// This is the domain the browser will report as the 'Origin'.
-const VERCEL_FRONTEND_URL = 'https://leave-management-system-6nfzgz9vl-ajit-singhs-projects-af6c039f.vercel.app'; 
+// FIX APPLIED: Using the LATEST correct Vercel Origin URL from the error message.
+const VERCEL_FRONTEND_URL = 'https://leave-management-system-q3j4ox1mo-ajit-singhs-projects-af6c039f.vercel.app'; 
 
 // Determine the allowed origin based on the environment
 const ALLOWED_ORIGIN = process.env.NODE_ENV === 'production' 
@@ -20,7 +19,7 @@ const ALLOWED_ORIGIN = process.env.NODE_ENV === 'production'
 
 // Middleware
 app.use(cors({
-    origin: ALLOWED_ORIGIN, // <--- This is the core fix for the "Network Failed" error
+    origin: ALLOWED_ORIGIN, // <--- This now matches your new Vercel domain
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true, // Important for cookies/auth tokens used in login
 }));
@@ -54,9 +53,9 @@ mongoose.connect(process.env.MONGO_URI)
     });
 
 // Routes 
+// WARNING: Ensure your authRoutes.js does NOT apply authMiddleware to the /login route
 app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/leaves', require('./routes/leaveRoutes'));
-
+app.use('/api/leaves', require('./routes/leaveRoutes')); 
 
 // Use PORT from environment (Render provides PORT automatically)
 const PORT = process.env.PORT || 5000;
