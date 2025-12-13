@@ -2,7 +2,7 @@ import { useState, useContext } from 'react';
 import axios from 'axios';
 import AuthContext from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import './Login.css'; // <-- ADD THIS
+import './Login.css';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -14,7 +14,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
-      login(res.data.token);
+      login(res.data.token, res.data.user.role); // Assuming login function is updated to take role
 
       if (res.data.user.role === 'manager') navigate('/manager');
       else navigate('/employee');
@@ -27,32 +27,45 @@ const Login = () => {
   return (
     <div className="login-container">
       
+      {/* Visual background element for animation */}
+      <div className="animated-background"></div>
+      
       <div className="login-card">
         <h2 className="login-title">Leave Management System</h2>
+        <p className="login-subtitle">Sign in to your dashboard</p>
 
         <form onSubmit={handleSubmit} className="login-form">
-          <label>Email</label>
-          <input 
-            type="email" 
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required 
-          />
+          
+          <div className="form-group">
+            <label htmlFor="email">Email Address</label>
+            <input 
+              type="email" 
+              id="email"
+              placeholder="e.g., you@company.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required 
+            />
+          </div>
 
-          <label>Password</label>
-          <input 
-            type="password" 
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required 
-          />
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input 
+              type="password" 
+              id="password"
+              placeholder="********"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required 
+            />
+          </div>
 
-          <button type="submit" className="login-btn">Login</button>
+          <button type="submit" className="login-btn">Secure Login</button>
         </form>
 
         <p className="login-hint">
-          Use <b>employee@test.com</b> or <b>manager@test.com</b><br />
-          Password: <b>123456</b>
+          Demo: Use **employee@test.com** or **manager@test.com**<br />
+          Password: **123456**
         </p>
       </div>
     </div>
